@@ -1,0 +1,68 @@
+*.orig
+# java related
+*.class
+*.jar
+!test/**/*.jar
+
+# python
+__pychache__/
+*.pyc
+train_log/
+
+# vm crash logs
+hs_err_pid*
+
+# idea
+.idea/
+*.iml
+
+# build tools
+build/
+dist/
+lib/
+.gradle/
+target/
+classes/
+dependency-reduced-pom.xml
+*.versionsBackup
+
+# midas
+config/*.properties
+*.log*
+!core/src/test/resources/*.jar
+!random-test/conf/log4j.properties
+!random-test/conf/conf.properties
+
+# conf
+config/*.conf
+config/*site.xml
+config/graphconf.xml
+config/*.py
+config/ldap-conn-pass.txt
+config/*.keytab
+dieu/conf/*.conf
+doc/en/ops/
+doc/zh/ops/
+
+# schema
+schema/update_sql.sh
+
+# static
+server/src/main/resources/static/
+*.html
+*.js*
+*.svg
+!*.json
+version
+
+# macOs files
+**/.DS_Store
+
+# automl
+smac3-output*
+projects/
+
+classpath:log4j.properties*
+
+sophon_doc/
+base/
