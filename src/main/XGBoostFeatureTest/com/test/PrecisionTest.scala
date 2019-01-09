@@ -23,14 +23,24 @@ object PrecisionTest {
     val t = 0
   }
 
-  def testIris(): Unit ={
+  def testIris(): Unit = {
 
     val spark = Tools.getSparkSession()
 
-    val irisDF = OftenUseDataSet.getGerman(spark)
-    val x = xgAndLR(irisDF)
-    val y = lr(irisDF)
-    val t = 0
+    val result1 = Array.fill(5)(0.0)
+    val result2 = Array.fill(5)(0.0)
+
+    val dataset = OftenUseDataSet.getGerman(spark)
+    for (i <- 0 until 5) {
+      result1(i) = lr(dataset)
+      result2(i) = xgAndLR(dataset)
+    }
+    val x = result1.sum / 5.0
+    val y = result2.sum / 5.0
+
+    val p = (y - x) / x * 100
+
+    print("OK")
 
   }
 
@@ -93,7 +103,7 @@ object PrecisionTest {
     val result = new LogisticRegression()
       .setThreshold(0.5)
       .setMaxIter(100)
-      .setTol(1.0e-6)
+      .setTol(1e-6)
       .setRegParam(0.0)
       .setElasticNetParam(0.0)
       .setFitIntercept(true)
