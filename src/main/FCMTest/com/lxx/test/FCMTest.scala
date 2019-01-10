@@ -1,6 +1,6 @@
 package com.lxx.test
 
-import org.apache.spark.ml.clustering.FuzzyCMeans
+import org.apache.spark.ml.extension.clustering.FuzzyCMeans
 import org.apache.spark.sql.SparkSession
 
 
