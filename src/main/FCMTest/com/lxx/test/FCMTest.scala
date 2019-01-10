@@ -1,12 +1,8 @@
 package com.lxx.test
 
-import org.apache.spark.ml.extension.clustering.FuzzyCMeans
-import org.apache.spark.ml.feature.VectorAssembler
-import org.apache.spark.ml.linalg.Vectors
+import org.apache.spark.ml.clustering.FuzzyCMeans
 import org.apache.spark.sql.SparkSession
-import spire.random.rng.Utils
 
-import scala.util.Random
 
 object FCMTest {
 
