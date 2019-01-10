@@ -2,8 +2,9 @@ package com.common
 
 import org.apache.spark.ml.attribute._
 import org.apache.spark.ml.evaluation.MulticlassClassificationEvaluator
+import org.apache.spark.mllib.util.MLUtils
 import org.apache.spark.sql.types.StructField
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 object Tools {
 
@@ -43,6 +44,19 @@ object Tools {
     GetNumClasses.getNumClasses(dataset.schema(OftenUseDataSet.labelColName)) match {
       case Some(n: Int) => n
       case None => dataset.select(OftenUseDataSet.labelColName).distinct().count().toInt
+    }
+  }
+
+  def kFold(
+      dataFrame: DataFrame,
+      numFolds: Int = 10,
+      seed: Int = 2): Array[(DataFrame, DataFrame)] = {
+    val context = dataFrame.sqlContext
+    val schema = dataFrame.schema
+    MLUtils.kFold(dataFrame.rdd, numFolds, seed).map { case (training, validate) =>
+      val trainDF = context.createDataFrame(training, schema)
+      val testDF = context.createDataFrame(validate, schema)
+      (trainDF, testDF)
     }
   }
 
