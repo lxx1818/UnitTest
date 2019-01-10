@@ -1,7 +1,7 @@
 package org.apache.spark.ml.feature
 
 import org.apache.spark.ml.classification.LogisticRegression
-import org.apache.spark.ml.fm._
+import org.apache.spark.ml.extension.fm._
 import org.apache.spark.ml.linalg.{Vector, VectorUDT}
 import org.apache.spark.ml.param._
 import org.apache.spark.ml.param.shared.HasOutputCol
