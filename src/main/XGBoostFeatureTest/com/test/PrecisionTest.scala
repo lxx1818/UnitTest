@@ -70,7 +70,7 @@ object PrecisionTest {
       .setNormalizeType("forest")
       .setRateDrop(0.1)
       .setSkipDrop(0.1)
-      .setRound(100)
+      .setRound(5)
       .setOutPutCol("outputVe")
       .setFeaturesCol(OftenUseDataSet.featureColName)
       .setLabelCol(OftenUseDataSet.labelColName)
