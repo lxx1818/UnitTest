@@ -93,7 +93,8 @@ object Tools {
       label: Boolean = false,
       featureLableCount: Int = 10,
       lableCount: Int = 2,
-      nullRatio: Double = 0): String = {
+      nullRatio: Double = 0,
+      path: String = "./"): String = {
     // 生成文件名
     val fileName = s"rowNum${rowNum}_featureNum${featureNum}_label${label}_nullRatio${nullRatio}"
 
@@ -127,7 +128,7 @@ object Tools {
     }
 
     // 写入数据集
-    rddFile.saveAsTextFile("./" + fileName)
+    rddFile.saveAsTextFile(path + fileName)
     fileName
   }
 
