@@ -1,6 +1,6 @@
 package FilterLowQualityColsTest
 
-import java.io.PrintWriter
+import java.io.{BufferedWriter, FileOutputStream, OutputStreamWriter, PrintWriter}
 
 import com.common.Tools
 import org.apache.spark.ml.preprocess.FilterLowQualityCols
@@ -12,45 +12,142 @@ import scala.io.Source
 object FilterLowQualityColsPressureTest {
 
   def main(args: Array[String]): Unit = {
-    testRows()
+//    if (args(0).equals("col")) {
+//      testCols()
+//    } else if (args(0).equals("row")){
+//      testRows()
+//    }
+//    generateRows()
+//    testCores(args(0))
+    testNullRatio()
   }
 
   def generateRows(): Unit = {
-    val spark = SparkSession.builder().appName("gen row data").getOrCreate()
+    val spark = SparkSession.builder().appName("gen rows data").getOrCreate()
 //    val spark = Tools.getSparkSession()
-    val colsNum = 100
+    val colsNum = 10
     val k = 1000
-    val rowsNumArr = Array(1, 10, 100, 1000, 5000, 10000)
+    val rowsNumArr = Array(2, 4, 8, 10, 20)
     val fileNames = Array.fill(rowsNumArr.length)("")
     rowsNumArr.indices.foreach { indice =>
-      fileNames(indice) = Tools.generateDataSet(rowsNumArr(indice) * k, colsNum, 200, spark)
+      fileNames(indice) = Tools.generateDataSet(rowsNumArr(indice) * k *10000, colsNum, 100, spark, path = "./rows/")
     }
-    Tools.write("./rowsFileName", fileNames)
+    val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./rowsFileName", true))), false)
+    out.print(fileNames.mkString("\n"))
+    out.close()
+//    Tools.write("./rowsFileName", fileNames)
+  }
+
+  def generateCols(): Unit = {
+    val spark = SparkSession.builder().appName("gen cols data").getOrCreate()
+    //    val spark = Tools.getSparkSession()
+    val colsNumArr = Array(10, 20, 40, 80, 200, 400, 600, 1000)
+    val k = 1000
+    val rowsNum = 10000 * k
+    val fileNames = Array.fill(colsNumArr.length)("")
+    colsNumArr.indices.foreach { indice =>
+      fileNames(indice) = Tools.generateDataSet(rowsNum, colsNumArr(indice), 100, spark, path = "./cols/")
+    }
+    Tools.write("./colsFileName", fileNames)
+  }
+
+
+  def generateNullRatio(): Unit = {
+    val spark = SparkSession.builder().appName("gen null data").getOrCreate()
+    //    val spark = Tools.getSparkSession()
+    val nullRatio = Array(0.0, 0.1, 0.2, 0.4, 0.6, 0.8)
+    val k = 1000
+    val rowsNum = 10000 * k
+    val fileNames = Array.fill(nullRatio.length)("")
+    nullRatio.indices.foreach { indice =>
+      fileNames(indice) = Tools.generateDataSet(rowsNum, 100, 100, spark, path = "./nulls/", nullRatio = nullRatio(indice))
+    }
+    Tools.write("./nullsFileName", fileNames)
   }
 
 
   def testRows(): Unit = {
-    val spark = SparkSession.builder().appName("test row").getOrCreate()
-    val rowsNumArr = Array(1, 10, 100, 1000, 5000, 10000)
+    val spark = SparkSession.builder().appName("test rows").getOrCreate()
 
-    val source = Source.fromFile("../DataSet/rowsFileName", "UTF-8")
+    val source = Source.fromFile("/home/lxx/DataSet/rowResult", "UTF-8")
     val lineIterator =source.getLines
-    val out = new PrintWriter("./rowResult")
-    var flag = true
-    for(file <- lineIterator if flag) {
-      val path = "../DataSet/" + file
+    for(file <- lineIterator) {
+      val path = "/home/lxx/DataSet/rows/" + file
+      val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./rowResult", true))), false)
       out.print(file)
-      val df = Tools.readDataFrameASInteger(path, spark).repartition(200)
+      val df = Tools.readDataFrameASInteger(path, spark).repartition(100)
       df.cache()
-      for (i <- 0 to 2) {
+      df.first()
+      for (i <- 0 to 4) {
         val time = run(df)
         out.print("," + time)
       }
       out.println(",rows:" + df.count() + ",cols:" + df.first().length)
       df.unpersist()
-//      flag = false
+      out.close
     }
-    out.close
+  }
+
+  def testCores(core: String): Unit = {
+    val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./coreResult2", true))), false)
+    val spark = SparkSession.builder().appName("test core").getOrCreate()
+    val path = "/home/lxx/DataSet/rows/rowNum10000000_featureNum10_labelfalse_nullRatio0.0"
+    val df = Tools.readDataFrameASInteger(path, spark).repartition(100)
+    out.print(core)
+    df.cache()
+    df.first()
+    for (i <- 0 to 4) {
+      val time = run(df)
+      out.print("," + time)
+    }
+    out.println(",rows:" + df.count() + ",cols:" + df.first().length)
+    df.unpersist()
+    spark.close()
+    out.close()
+  }
+
+  def testCols(): Unit = {
+    val spark = SparkSession.builder().appName("test cols").getOrCreate()
+
+    val source = Source.fromFile("/home/lxx/DataSet/colsFileName", "UTF-8")
+    val lineIterator =source.getLines
+    for(file <- lineIterator) {
+      val path = "/home/lxx/DataSet/cols/" + file
+      val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./colResult", true))), false)
+      out.print(file)
+      val df = Tools.readDataFrameASInteger(path, spark).repartition(100)
+      df.cache()
+      df.first()
+      for (i <- 0 to 4) {
+        val time = run(df)
+        out.print("," + time)
+      }
+      out.println(",rows:" + df.count() + ",cols:" + df.first().length)
+      df.unpersist()
+      out.close
+    }
+  }
+
+  def testNullRatio(): Unit = {
+    val spark = SparkSession.builder().appName("test null ratio").getOrCreate()
+
+    val source = Source.fromFile("/home/lxx/DataSet/nullsFileName", "UTF-8")
+    val lineIterator =source.getLines
+    for(file <- lineIterator) {
+      val path = "/home/lxx/DataSet/nulls/" + file
+      val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream("./nullResult", true))), false)
+      out.print(file)
+      val df = Tools.readDataFrameASInteger(path, spark).repartition(100)
+      df.cache()
+      df.first()
+      for (i <- 0 to 4) {
+        val time = run(df)
+        out.print("," + time)
+      }
+      out.println(",rows:" + df.count() + ",cols:" + df.first().length)
+      df.unpersist()
+      out.close
+    }
   }
 
 

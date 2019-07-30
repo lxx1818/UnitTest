@@ -1,11 +1,13 @@
 package WriteToFile
 
-import java.io.PrintWriter
+import java.io.{BufferedWriter, FileOutputStream, OutputStreamWriter, PrintWriter}
+
 import scala.io.Source
 
 object WriteToFile {
   def main(args: Array[String]): Unit = {
 
+    write()
     write()
   }
 
@@ -25,8 +27,9 @@ object WriteToFile {
   }
 
   def write(): Unit = {
-    val out = new PrintWriter("/home/lxx/data/123456789.txt")
-    for(i<-1 to 100)
+    val path = "./testlxx"
+    val out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path, true))), false)
+    for(i<-1 to 10)
       out.println(i)
     out.close
   }
