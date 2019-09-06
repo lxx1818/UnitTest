@@ -11,6 +11,10 @@ import org.apache.spark.sql.{DataFrame, Dataset, Row, SparkSession}
 
 object Tools {
 
+
+  def read_csv(spark:SparkSession, path: String): DataFrame = {
+    spark.read.format("csv").load(path)
+  }
   /**
     * 返回默认的列名
     * num: 列数
