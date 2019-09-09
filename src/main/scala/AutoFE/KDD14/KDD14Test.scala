@@ -10,6 +10,7 @@ object KDD14Test {
 
     val path = ""
 
+    //
     val projectsDF = Tools.read_csv(spark, path + "projects.csv")
     val outcomeDF = Tools.read_csv(spark, path+"outcomes.csv")
     val resourcesDF = Tools.read_csv(spark, path+"resources.csv")
@@ -19,6 +20,9 @@ object KDD14Test {
 
     val newProjectsDF = projectsDF.join(outcomeDF)
 
+    // 分离测试集和训练集
+
+    
 
 
   }
